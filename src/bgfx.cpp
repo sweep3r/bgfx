@@ -1858,7 +1858,23 @@ namespace bgfx
 
 	bool Context::init(const Init& _init)
 	{
-		BX_ASSERT(!m_rendererInitialized, "Already initialized?");
+		if (m_rendererInitialized)
+		{
+            // Possible patch part 2 for re-init, WIP -hwd.
+			if (_init.platformData.ndt          == NULL
+			&&  _init.platformData.nwh          != NULL
+			&&  _init.platformData.context      == NULL
+			&&  _init.platformData.backBuffer   == NULL
+			&&  _init.platformData.backBufferDS == NULL)
+			{
+				m_init.platformData.nwh = g_platformData.nwh;
+				return true;
+			}
+			else
+			{
+				BX_ASSERT(!m_rendererInitialized, "Already initialized?");
+			}
+		}
 
 		m_init = _init;
 		m_init.resolution.reset &= ~BGFX_RESET_INTERNAL_FORCE;
@@ -3450,7 +3466,23 @@ namespace bgfx
 	{
 		if (NULL != s_ctx)
 		{
-			BX_TRACE("bgfx is already initialized.");
+			// Possible patch for re-init, WIP -hwd.
+			if (_userInit.platformData.ndt          == NULL
+			&&  _userInit.platformData.nwh          != NULL
+			&&  _userInit.platformData.context      == NULL
+			&&  _userInit.platformData.backBuffer   == NULL
+			&&  _userInit.platformData.backBufferDS == NULL)
+			{
+				BX_TRACE("bgfx re-init called.");
+				g_platformData.nwh = _userInit.platformData.nwh;
+				s_ctx->init(_userInit);
+				return true;
+			}
+			else
+			{
+				BX_TRACE("bgfx is already initialized.");
+			}
+
 			return false;
 		}
 
