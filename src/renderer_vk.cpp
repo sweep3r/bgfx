@@ -1791,7 +1791,8 @@ VK_IMPORT_INSTANCE
 
 			errorState = ErrorState::DeviceCreated;
 
-			BX_TRACE("Device functions:");
+            BX_ASSERT(NULL != m_device, "No vulkan devide (emulator?)");
+            BX_TRACE("Device functions:");
 #define VK_IMPORT_DEVICE_FUNC(_optional, _func)                         \
 			_func = (PFN_##_func)vkGetDeviceProcAddr(m_device, #_func); \
 			BX_TRACE("\t%p " #_func, _func);                            \
